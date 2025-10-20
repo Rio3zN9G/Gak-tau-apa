@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Selamat kamu sudah bisa bertahan sampai sekarang!!</title>
+<title>Semangat Terus dan Jangan Menyerah!</title>
 <style>
   :root{ --bg1:#0b1020; --bg2:#111a3a; --accent:#ffd166; --text:#eaf2ff; --muted:#9fb0d2; }
   *{box-sizing:border-box} html,body{height:100%}
@@ -51,7 +51,7 @@
   .cta{
     display:inline-flex; align-items:center; gap:8px; padding:8px 14px;
     font-weight:800; letter-spacing:.3px; text-decoration:none; color:#0b1020;
-    background:var(--accent); border-radius:999px;
+    background:var(--accent); border-radius:999px; cursor:pointer;
     box-shadow:0 6px 20px #ffd16655, inset 0 1px 0 #fff6; transition:transform .15s ease;
   }
   .cta:hover{ transform:translateY(-1px) scale(1.02) }
@@ -81,13 +81,43 @@
 
   .hint{ position:fixed; bottom:10px; left:50%; transform:translateX(-50%); font-size:12px; opacity:.7; user-select:none }
   @media (prefers-reduced-motion: reduce){ .card,.cursor .ring,.cursor .dot{ animation:none } }
+
+  /* Modal/Popup Styles */
+  .modal {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background-color: rgba(0, 0, 0, 0.85); z-index: 10;
+    display: none; /* Hidden by default */
+    justify-content: center; align-items: center;
+    backdrop-filter: blur(4px);
+  }
+  .modal-content {
+    max-width: 90%; max-height: 90%;
+    background: #1c2656; border-radius: 12px;
+    padding: 15px; position: relative;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    animation: slideUp 0.3s ease-out;
+  }
+  .modal-content img {
+    display: block; width: auto; max-width: 100%; max-height: 80vh;
+    border-radius: 8px;
+  }
+  .close-btn {
+    position: absolute; top: 10px; right: 20px;
+    color: var(--accent); font-size: 30px; font-weight: bold;
+    cursor: pointer; transition: color 0.2s;
+    line-height: 1; text-shadow: 0 0 5px #ffd16688;
+  }
+  .close-btn:hover, .close-btn:focus { color: #fff; }
+  @keyframes slideUp {
+    from { transform: translateY(50px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
 </style>
 </head>
 <body>
   <canvas id="scene" aria-hidden="true"></canvas>
   <div class="stars" aria-hidden="true"></div>
 
-  <!-- Fancy cursor (no ribbon) -->
   <div class="cursor" aria-hidden="true">
     <div class="ring"></div>
     <div class="dot"></div>
@@ -95,11 +125,18 @@
 
   <main class="hero" role="main">
     <section class="card">
-      <h1><span class="big">Selamat</span> cantik 🎉</h1>
-      <p class="sub">Kamu sudah bisa bertahan di titik ini sapi. ❤️</p>
-      <a class="cta" href="s.jpg" target="_blank" rel="noopener">Clickme</a>
+      <h1><span class="big">SEMANGAT</span> TERUS! 🎉</h1>
+      <p class="sub">Kamu sudah bisa bertahan sampai titik ini. Kamu hebat dan jangan pernah menyerah! ❤️</p>
+      <button id="show-image-btn" class="cta">Klik aku</button>
     </section>
   </main>
+
+  <div id="image-modal" class="modal">
+    <div class="modal-content">
+      <span class="close-btn">&times;</span>
+      <img src="s.jpg" alt="Foto Semangat" />
+    </div>
+  </div>
 
   <div class="hint">Klik Pecahkan balon!</div>
 
@@ -396,18 +433,18 @@
   }
   requestAnimationFrame(loop);
 
-  /* ---------- Interaction ---------- */
+  /* ---------- Interaction (Rocket, Balloon, and NEW: Modal) ---------- */
   var isDown=false;
   function pointerDown(e){
-    isDown = true;
+    // isDown = true; // Disabled continuous rocket barrage on main click
     ensureAudio(); // create/resume audio after user gesture
-    rocket(e.clientX);
+    // rocket(e.clientX); // Removed automatic rocket on pointerdown
   }
   function pointerUp(){ isDown = false; }
   window.addEventListener('pointerdown', pointerDown);
   window.addEventListener('pointerup', pointerUp);
 
-  // Hold to barrage
+  // Hold to barrage (only works on non-button areas)
   setInterval(function(){ if(isDown && !prefersReduced) rocket(pointer.x); }, 240);
 
   // Pop balloons
@@ -432,8 +469,34 @@
   document.addEventListener('visibilitychange', function(){
     if (document.hidden){ particles.length=0; rockets.length=0; }
   });
+
+  /* ---------- Modal (Popup) Logic ---------- */
+  var modal = document.getElementById('image-modal');
+  var btn = document.getElementById('show-image-btn');
+  var span = document.getElementsByClassName('close-btn')[0];
+
+  btn.onclick = function() {
+    modal.style.display = 'flex'; // Show modal
+    ensureAudio();
+    // Tambahkan efek kembang api saat tombol diklik
+    rocket(W/2);
+    // Tambahkan kembang api lagi di posisi berbeda untuk efek lucu
+    setTimeout(() => rocket(W/2 + 50), 150);
+    setTimeout(() => rocket(W/2 - 50), 300);
+  }
+
+  span.onclick = function() {
+    modal.style.display = 'none'; // Hide modal when 'x' is clicked
+  }
+
+  // Hide modal when user clicks anywhere outside of the modal content
+  window.onclick = function(event) {
+    if (event.target == modal) {
+      modal.style.display = 'none';
+    }
+  }
+
 })();
 </script>
 </body>
 </html>
-
